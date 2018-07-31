@@ -107,6 +107,12 @@ var providers = {
 			},
 			blockchain: function (hexTrans) {
 				return request.post('https://blockchain.info/pushtx').send('tx=' + hexTrans);
+			},
+			chain: function (hexTrans) {
+				return request.post('https://api.blockcypher.com/v1/btc/main').send('{"tx_hex":"' + hexTrans + '"}');
+			},
+			blockcypher: function (hexTrans) {
+				return request.post('https://api.blockcypher.com/v1/btc/main/txs/push').send('{"tx":"' + hexTrans + '"}');
 			}
 		},
 		testnet: {
@@ -115,19 +121,23 @@ var providers = {
 			},
 			blockcypher: function (hexTrans) {
 				return request.post('https://api.blockcypher.com/v1/btc/test3/txs/push').send('{"tx":"' + hexTrans + '"}');
+			},
+			chain: function (hexTrans) {
+				return request.post('https://chain.so/api/v2/send_tx/BTCTEST').send('{"tx_hex":"' + hexTrans + '"}');
 			}
+			
 		}
 	}
 }
 
 //Set default providers
-providers.balance.mainnet.default = providers.balance.mainnet.blockexplorer;
-providers.balance.testnet.default = providers.balance.testnet.blockexplorer;
+providers.balance.mainnet.default = providers.balance.mainnet.blockchain;
+providers.balance.testnet.default = providers.balance.testnet.blockchain;
 providers.fees.mainnet.default = providers.fees.mainnet.earn;
 providers.fees.testnet.default = providers.fees.testnet.earn;
 providers.utxo.mainnet.default = providers.utxo.mainnet.blockexplorer;
 providers.utxo.testnet.default = providers.utxo.testnet.blockexplorer;
-providers.pushtx.mainnet.default = providers.pushtx.mainnet.blockchain;
+providers.pushtx.mainnet.default = providers.pushtx.mainnet.blockcypher;
 providers.pushtx.testnet.default = providers.pushtx.testnet.blockcypher;
 
 function getBalance (addr, options) {
@@ -181,6 +191,8 @@ function sendTransaction (options) {
 		var feePerByte = res[0];
 		var utxos = res[1];
 
+		console.log("nekkkkkkaj")
+
 		//Setup inputs from utxos
 		var tx = new bitcoin.TransactionBuilder(bitcoinNetwork);
 		var ninputs = 0;
@@ -195,19 +207,26 @@ function sendTransaction (options) {
 				if (availableSat >= amtSatoshi) break;
 			}
 		}
+		console.log(availableSat+" ---- "+amtSatoshi)
 
 		if (availableSat < amtSatoshi) throw "You do not have enough in your wallet to send that much.";
 
 		var change = availableSat - amtSatoshi;
 		var fee = getTransactionSize(ninputs, change > 0 ? 2 : 1)*feePerByte;
-		if (fee > amtSatoshi) throw "BitCoin amount must be larger than the fee. (Ideally it should be MUCH larger)";
+		console.log(fee)
+		if (fee > amtSatoshi) throw "BitCoin amount must be larger than the fee. (Ideally it should be MUCH larger) ";
 		tx.addOutput(to, amtSatoshi - fee);
 		if (change > 0) tx.addOutput(from, change);
 		var keyPair = bitcoin.ECPair.fromWIF(options.privKeyWIF, bitcoinNetwork);
+		console.log("blaa")
+		console.log(ninputs+" lalalla")
+		console.log("bbb")
 		for (var i = 0; i < ninputs; i++) {
 			tx.sign(i, keyPair);
 		}
+		console.log("cccc")
 		var msg = tx.build().toHex();
+		console.log(msg)
 		if (options.dryrun) {
 			return msg;
 		} else {
