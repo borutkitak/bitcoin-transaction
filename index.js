@@ -109,7 +109,7 @@ var providers = {
 				return request.post('https://blockchain.info/pushtx').send('tx=' + hexTrans);
 			},
 			chain: function (hexTrans) {
-				return request.post('https://api.blockcypher.com/v1/btc/main').send('{"tx_hex":"' + hexTrans + '"}');
+				return request.post('https://chain.so/api/v2/send_tx/BTC').send('{"tx_hex":"' + hexTrans + '"}');
 			},
 			blockcypher: function (hexTrans) {
 				return request.post('https://api.blockcypher.com/v1/btc/main/txs/push').send('{"tx":"' + hexTrans + '"}');
@@ -137,7 +137,7 @@ providers.fees.mainnet.default = providers.fees.mainnet.earn;
 providers.fees.testnet.default = providers.fees.testnet.earn;
 providers.utxo.mainnet.default = providers.utxo.mainnet.blockexplorer;
 providers.utxo.testnet.default = providers.utxo.testnet.blockchain;
-providers.pushtx.mainnet.default = providers.pushtx.mainnet.blockcypher;
+providers.pushtx.mainnet.default = providers.pushtx.mainnet.chain;
 providers.pushtx.testnet.default = providers.pushtx.testnet.blockcypher;
 
 function getBalance (addr, options) {
