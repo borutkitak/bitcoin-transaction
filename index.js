@@ -205,7 +205,7 @@ function sendTransaction (options) {
 				if (availableSat >= amtSatoshi) break;
 			}
 		}
-		console.log(availableSat+" ---- "+amtSatoshi)
+		console.log(availableSat+" ---- "+amtSatoshi+" ----- "+feePerByte)
 
 		if (availableSat < amtSatoshi) throw "You do not have enough in your wallet to send that much.";
 
