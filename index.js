@@ -125,7 +125,7 @@ var providers = {
 			chain: function (hexTrans) {
 				return request.post('https://chain.so/api/v2/send_tx/BTCTEST').send('{"tx_hex":"' + hexTrans + '"}');
 			}
-			
+
 		}
 	}
 }
@@ -191,8 +191,6 @@ function sendTransaction (options) {
 		var feePerByte = res[0];
 		var utxos = res[1];
 
-		console.log("nekkkkkkaj")
-
 		//Setup inputs from utxos
 		var tx = new bitcoin.TransactionBuilder(bitcoinNetwork);
 		var ninputs = 0;
@@ -213,20 +211,14 @@ function sendTransaction (options) {
 
 		var change = availableSat - amtSatoshi;
 		var fee = getTransactionSize(ninputs, change > 0 ? 2 : 1)*feePerByte;
-		console.log(fee)
 		if (fee > amtSatoshi) throw "BitCoin amount must be larger than the fee. (Ideally it should be MUCH larger) ";
 		tx.addOutput(to, amtSatoshi - fee);
 		if (change > 0) tx.addOutput(from, change);
 		var keyPair = bitcoin.ECPair.fromWIF(options.privKeyWIF, bitcoinNetwork);
-		console.log("blaa")
-		console.log(ninputs+" lalalla")
-		console.log("bbb")
 		for (var i = 0; i < ninputs; i++) {
 			tx.sign(i, keyPair);
 		}
-		console.log("cccc")
 		var msg = tx.build().toHex();
-		console.log(msg)
 		if (options.dryrun) {
 			return msg;
 		} else {
