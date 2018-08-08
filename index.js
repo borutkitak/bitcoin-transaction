@@ -109,7 +109,7 @@ var providers = {
 				return request.post('https://blockchain.info/pushtx').send('tx=' + hexTrans);
 			},
 			chain: function (hexTrans) {
-				return request.post('https://chain.so/api/v2/send_tx/BTC').send('{"tx_hex":"' + hexTrans + '"}');
+				return request.post('https://api.blockcypher.com/v1/btc/main').send('{"tx_hex":"' + hexTrans + '"}');
 			},
 			blockcypher: function (hexTrans) {
 				return request.post('https://api.blockcypher.com/v1/btc/main/txs/push').send('{"tx":"' + hexTrans + '"}');
@@ -136,7 +136,7 @@ providers.balance.testnet.default = providers.balance.testnet.blockchain;
 providers.fees.mainnet.default = providers.fees.mainnet.earn;
 providers.fees.testnet.default = providers.fees.testnet.earn;
 providers.utxo.mainnet.default = providers.utxo.mainnet.blockexplorer;
-providers.utxo.testnet.default = providers.utxo.testnet.blockchain;
+providers.utxo.testnet.default = providers.utxo.testnet.blockexplorer;
 providers.pushtx.mainnet.default = providers.pushtx.mainnet.blockcypher;
 providers.pushtx.testnet.default = providers.pushtx.testnet.blockcypher;
 
@@ -205,13 +205,9 @@ function sendTransaction (options) {
 				if (availableSat >= amtSatoshi) break;
 			}
 		}
-		console.log(availableSat+" ---- "+amtSatoshi+" ----- "+feePerByte)
-
 		if (availableSat < amtSatoshi) throw "You do not have enough in your wallet to send that much.";
 
 		var change = availableSat - amtSatoshi;
-
-		console.log(change)
 		var fee = getTransactionSize(ninputs, change > 0 ? 2 : 1)*feePerByte;
 		console.log(fee)
 		if (fee > amtSatoshi) throw "BitCoin amount must be larger than the fee. (Ideally it should be MUCH larger) ";
