@@ -210,8 +210,10 @@ function sendTransaction (options) {
 		if (availableSat < amtSatoshi) throw "You do not have enough in your wallet to send that much.";
 
 		var change = availableSat - amtSatoshi;
+
+		console.log(change)
 		var fee = getTransactionSize(ninputs, change > 0 ? 2 : 1)*feePerByte;
-		fee = fee/100000000;
+		console.log(fee)
 		if (fee > amtSatoshi) throw "BitCoin amount must be larger than the fee. (Ideally it should be MUCH larger) ";
 		tx.addOutput(to, amtSatoshi - fee);
 		if (change > 0) tx.addOutput(from, change);
